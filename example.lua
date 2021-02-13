@@ -52,7 +52,7 @@ addon.link      = 'https://ashitaxi.com/';      -- (Optional) The link to the ad
     -   Events now do not have their arguments passed individually. Instead, arguments are passed as a means of 'event args'.
         This causes the arguments to be passed as a structure to the event which has sub-properties. (See the event examples
         below for each events arguments.)
-    -   Blocking an event is now done, if available, via setting the 'blocked' argument (ie. args.blocked = true;)
+    -   Blocking an event is now done, if available, via setting the 'blocked' argument (ie. e.blocked = true;)
     -   Some events now also have 'raw' versions of some arguments. These are direct pointers that can be used with LuaJIT's 'ffi'
         extension giving you direct memory access to things. (Please be warned, misuse can and will lead to client crashes!)
     -   Registering events now take an additional argument, an alias, which is used to allow for multiple event callbacks per event
@@ -155,20 +155,20 @@ addon.link      = 'https://ashitaxi.com/';      -- (Optional) The link to the ad
 
     Take the following for example:
 
-        ashita.events.register('packet_in', 'packet_in_callback1', function (args)
-            if (args.id == 0x1A) then
+        ashita.events.register('packet_in', 'packet_in_callback1', function (e)
+            if (e.id == 0x1A) then
                 -- Sleep for 5 seconds, suspending this event callback..
                 coroutine.sleep(5); 
                 print('Slept for 5 seconds after seeing a 0x1A packet!');
 
                 -- Invalid; the event was suspended, thus doing this will do nothing..
-                args.blocked = true;
+                e.blocked = true;
             end
         end);
 
     By calling 'coroutine.sleep', we cause the coroutine for this event call to be suspended. In this example, we sleep the event for 5
     seconds, where it will be resumed and continue where the code left off. However, because we slept the event, the event is no longer
-    valid to be manipulated by that event call. This means that doing anything to the 'args' object or trying to block it will do nothing.
+    valid to be manipulated by that event call. This means that doing anything to the 'e' object or trying to block it will do nothing.
 
     If you need to block an event and sleep it to do something afterward, be sure to block it before sleeping first!
 --]]
@@ -240,25 +240,25 @@ end);
 -- func: command
 -- desc: Event called when the addon is processing a command.
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('command', 'command_callback1', function (args)
+ashita.events.register('command', 'command_callback1', function (e)
     --[[ Valid Arguments
 
-        args.mode       - (ReadOnly) The mode of the command.
-        args.command    - (ReadOnly) The raw command string.
-        args.injected   - (ReadOnly) Flag that states if the command was injected by Ashita or an addon/plugin.
-        args.blocked    - Flag that states if the command has been, or should be, blocked.
+        e.mode       - (ReadOnly) The mode of the command.
+        e.command    - (ReadOnly) The raw command string.
+        e.injected   - (ReadOnly) Flag that states if the command was injected by Ashita or an addon/plugin.
+        e.blocked    - Flag that states if the command has been, or should be, blocked.
     --]]
 
     -- Handle the /test command..
-    if (args.command == '/test') then
+    if (e.command == '/test') then
         print("[Example] Blocking '/test' command!");
-        args.blocked = true;
+        e.blocked = true;
     end
 
     -- Handle the /test2 command from a macro button..
-    if (args.mode == 2 and args.command == '/test2') then
+    if (e.mode == 2 and e.command == '/test2') then
         print("[Example] Blocking '/test2' command from macro only!");
-        args.blocked = true;
+        e.blocked = true;
     end
 end);
 
@@ -266,17 +266,17 @@ end);
 -- func: text_in
 -- desc: Event called when the addon is processing incoming text.
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('text_in', 'text_in_callback1', function (args)
+ashita.events.register('text_in', 'text_in_callback1', function (e)
     --[[ Valid Arguments
 
-        args.mode               - (ReadOnly) The message mode.
-        args.indent             - (ReadOnly) Flag that determines if the message is indented.
-        args.message            - (ReadOnly) The raw message string.
-        args.mode_modified      - The modified mode.
-        args.indent_modified    - The modified indent flag.
-        args.message_modified   - The modified message.
-        args.injected           - (ReadOnly) Flag that states if the text was injected by Ashita or an addon/plugin.
-        args.blocked            - Flag that states if the text has been, or should be, blocked.
+        e.mode               - (ReadOnly) The message mode.
+        e.indent             - (ReadOnly) Flag that determines if the message is indented.
+        e.message            - (ReadOnly) The raw message string.
+        e.mode_modified      - The modified mode.
+        e.indent_modified    - The modified indent flag.
+        e.message_modified   - The modified message.
+        e.injected           - (ReadOnly) Flag that states if the text was injected by Ashita or an addon/plugin.
+        e.blocked            - Flag that states if the text has been, or should be, blocked.
     --]]
 
     --[[ Note: Deadlock Warning!
@@ -288,20 +288,20 @@ ashita.events.register('text_in', 'text_in_callback1', function (args)
             You should avoid printing from this function as much as possible!
     --]]
 
-    if (not args.injected) then
-        print(string.format("[Example] 'text_in' event was called: (non-injected) %s", args.message));
+    if (not e.injected) then
+        print(string.format("[Example] 'text_in' event was called: (non-injected) %s", e.message));
     end
 
-    -- Mark all incoming text as indented to demo modding args..
-    if (not args.blocked and not args.indent) then
-        args.indent_modified = true;
+    -- Mark all incoming text as indented to demo modding e..
+    if (not e.blocked and not e.indent) then
+        e.indent_modified = true;
     end
 
     -- Look for and modify messages starting with '1' as an example.. (/echo 1)
-    if (not args.blocked and not args.injected) then
-        if (string.sub(args.message, 1, 1) == '1') then
-            args.mode_modified      = 4;
-            args.message_modified   = '(Modified!)';
+    if (not e.blocked and not e.injected) then
+        if (string.sub(e.message, 1, 1) == '1') then
+            e.mode_modified      = 4;
+            e.message_modified   = '(Modified!)';
         end
     end
 end);
@@ -310,56 +310,56 @@ end);
 -- func: text_out
 -- desc: Event called when the addon is processing outgoing text.
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('text_out', 'text_out_callback1', function (args)
+ashita.events.register('text_out', 'text_out_callback1', function (e)
     --[[ Valid Arguments
 
-        args.mode               - (ReadOnly) The message mode.
-        args.message            - (ReadOnly) The raw message string.
-        args.mode_modified      - The modified mode.
-        args.message_modified   - The modified message.
-        args.injected           - (ReadOnly) Flag that states if the text was injected by Ashita or an addon/plugin.
-        args.blocked            - Flag that states if the text has been, or should be, blocked.
+        e.mode               - (ReadOnly) The message mode.
+        e.message            - (ReadOnly) The raw message string.
+        e.mode_modified      - The modified mode.
+        e.message_modified   - The modified message.
+        e.injected           - (ReadOnly) Flag that states if the text was injected by Ashita or an addon/plugin.
+        e.blocked            - Flag that states if the text has been, or should be, blocked.
     --]]
 
     -- Block /wave commands not handled previously in the command event..
-    if (not args.injected) then
-        if (string.sub(args.message, 1, 5) == '/wave') then
-            args.blocked = true;
+    if (not e.injected) then
+        if (string.sub(e.message, 1, 5) == '/wave') then
+            e.blocked = true;
             return;
         end
     end
 
-    print("[Example] 'text_out' event was called: " .. args.message);
+    print("[Example] 'text_out' event was called: " .. e.message);
 end);
 
 ----------------------------------------------------------------------------------------------------
 -- func: packet_in
 -- desc: Event called when the addon is processing incoming packets.
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('packet_in', 'packet_in_callback1', function (args)
+ashita.events.register('packet_in', 'packet_in_callback1', function (e)
     --[[ Valid Arguments
 
-        args.id                 - (ReadOnly) The id of the packet.
-        args.size               - (ReadOnly) The size of the packet.
-        args.data               - (ReadOnly) The data of the packet.
-        args.data_raw           - The raw data pointer of the packet. (Use with FFI.)
-        args.data_modified      - The modified data.
-        args.data_modified_raw  - The modified raw data. (Use with FFI.)
-        args.chunk_size         - The size of the full packet chunk that contained the packet.
-        args.chunk_data         - The data of the full packet chunk that contained the packet.
-        args.chunk_data_raw     - The raw data pointer of the full packet chunk that contained the packet. (Use with FFI.)
-        args.injected           - (ReadOnly) Flag that states if the packet was injected by Ashita or an addon/plugin.
-        args.blocked            - Flag that states if the packet has been, or should be, blocked.
+        e.id                 - (ReadOnly) The id of the packet.
+        e.size               - (ReadOnly) The size of the packet.
+        e.data               - (ReadOnly) The data of the packet.
+        e.data_raw           - The raw data pointer of the packet. (Use with FFI.)
+        e.data_modified      - The modified data.
+        e.data_modified_raw  - The modified raw data. (Use with FFI.)
+        e.chunk_size         - The size of the full packet chunk that contained the packet.
+        e.chunk_data         - The data of the full packet chunk that contained the packet.
+        e.chunk_data_raw     - The raw data pointer of the full packet chunk that contained the packet. (Use with FFI.)
+        e.injected           - (ReadOnly) Flag that states if the packet was injected by Ashita or an addon/plugin.
+        e.blocked            - Flag that states if the packet has been, or should be, blocked.
     --]]
 
     -- Look for emote packets..
-    if (args.id == 0x5A) then
+    if (e.id == 0x5A) then
         -- Look for /dance emotes and replace them with /wave instead..
-        local emoteId = struct.unpack('b', args.data, 0x10 + 1);
+        local emoteId = struct.unpack('b', e.data, 0x10 + 1);
         if (emoteId == 31) then
             -- Use FFI to convert to the data and modify it to /wave..
             local ffi = require('ffi');
-            local ptr = ffi.cast('uint8_t*', args.data_modified_raw);
+            local ptr = ffi.cast('uint8_t*', e.data_modified_raw);
             ptr[0x10] = 8;
         end
     end
@@ -369,27 +369,27 @@ end);
 -- func: packet_out
 -- desc: Event called when the addon is processing outgoing packets.
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('packet_out', 'packet_out_callback1', function (args)
+ashita.events.register('packet_out', 'packet_out_callback1', function (e)
     --[[ Valid Arguments
 
-        args.id                 - (ReadOnly) The id of the packet.
-        args.size               - (ReadOnly) The size of the packet.
-        args.data               - (ReadOnly) The data of the packet.
-        args.data_raw           - The raw data pointer of the packet. (Use with FFI.)
-        args.data_modified      - The modified data.
-        args.data_modified_raw  - The modified raw data. (Use with FFI.)
-        args.chunk_size         - The size of the full packet chunk that contained the packet.
-        args.chunk_data         - The data of the full packet chunk that contained the packet.
-        args.chunk_data_raw     - The raw data pointer of the full packet chunk that contained the packet. (Use with FFI.)
-        args.injected           - (ReadOnly) Flag that states if the packet was injected by Ashita or an addon/plugin.
-        args.blocked            - Flag that states if the packet has been, or should be, blocked.
+        e.id                 - (ReadOnly) The id of the packet.
+        e.size               - (ReadOnly) The size of the packet.
+        e.data               - (ReadOnly) The data of the packet.
+        e.data_raw           - The raw data pointer of the packet. (Use with FFI.)
+        e.data_modified      - The modified data.
+        e.data_modified_raw  - The modified raw data. (Use with FFI.)
+        e.chunk_size         - The size of the full packet chunk that contained the packet.
+        e.chunk_data         - The data of the full packet chunk that contained the packet.
+        e.chunk_data_raw     - The raw data pointer of the full packet chunk that contained the packet. (Use with FFI.)
+        e.injected           - (ReadOnly) Flag that states if the packet was injected by Ashita or an addon/plugin.
+        e.blocked            - Flag that states if the packet has been, or should be, blocked.
     --]]
 
     -- Look for emote packets..
-    if (args.id == 0x5D) then
+    if (e.id == 0x5D) then
         -- Look for /panic emotes and replace them with /wave instead.. (All via FFI)
         local ffi = require('ffi');
-        local ptr = ffi.cast('uint8_t*', args.data_modified_raw);
+        local ptr = ffi.cast('uint8_t*', e.data_modified_raw);
 
         -- Replace the emote..
         if (ptr[0x0A] == 29) then
@@ -402,13 +402,13 @@ end);
 -- func: plugin_event
 -- desc: Event called when the addon is processing plugin events.
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('plugin_event', 'plugin_event_callback1', function (args)
+ashita.events.register('plugin_event', 'plugin_event_callback1', function (e)
     --[[ Valid Arguments
 
-        args.name       - (ReadOnly) The name of the plugin event.
-        args.data       - The data of the event.
-        args.data_raw   - The raw data pointer of the event. (Use with FFI.)
-        args.size       - (ReadOnly) The size of the data.
+        e.name       - (ReadOnly) The name of the plugin event.
+        e.data       - The data of the event.
+        e.data_raw   - The raw data pointer of the event. (Use with FFI.)
+        e.size       - (ReadOnly) The size of the data.
     --]]
 end);
 
@@ -416,12 +416,12 @@ end);
 -- func: key
 -- desc: Event called when the addon is processing keyboard input. (WNDPROC)
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('key', 'key_callback1', function (args)
+ashita.events.register('key', 'key_callback1', function (e)
     --[[ Valid Arguments
 
-        args.wparam     - (ReadOnly) The wparam of the event.
-        args.lparam     - (ReadOnly) The lparam of the event.
-        args.blocked    - Flag that states if the key has been, or should be, blocked.
+        e.wparam     - (ReadOnly) The wparam of the event.
+        e.lparam     - (ReadOnly) The lparam of the event.
+        e.blocked    - Flag that states if the key has been, or should be, blocked.
 
         See the following article for how to process and use wparam/lparam values:
         https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms644984(v=vs.85)
@@ -439,8 +439,8 @@ ashita.events.register('key', 'key_callback1', function (args)
     --]]
 
     -- Block left-arrow key presses.. (Blocks in chat input.)
-    if (args.wparam == 37) then
-        args.blocked = true;
+    if (e.wparam == 37) then
+        e.blocked = true;
     end
 end);
 
@@ -448,12 +448,12 @@ end);
 -- func: key_data
 -- desc: Event called when the addon is processing keyboard input. (DirectInput GetDeviceData)
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('key_data', 'key_data_callback1', function (args)
+ashita.events.register('key_data', 'key_data_callback1', function (e)
     --[[ Valid Arguments
 
-        args.key        - (ReadOnly) The DirectInput key id.
-        args.down       - (ReadOnly) The down state of the key.
-        args.blocked    - Flag that states if the key has been, or should be, blocked.
+        e.key        - (ReadOnly) The DirectInput key id.
+        e.down       - (ReadOnly) The down state of the key.
+        e.blocked    - Flag that states if the key has been, or should be, blocked.
 
         Note: Key codes used here are considered 'DirectInput key codes'.
     --]]
@@ -468,8 +468,8 @@ ashita.events.register('key_data', 'key_data_callback1', function (args)
     --]]
 
     -- Block left-arrow key presses.. (Blocks game input; initial press.)
-    if (args.key == 203) then
-        args.blocked = true;
+    if (e.key == 203) then
+        e.blocked = true;
     end
 end);
 
@@ -477,12 +477,12 @@ end);
 -- func: key_state
 -- desc: Event called when the addon is processing keyboard input. (DirectInput GetDeviceState)
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('key_state', 'key_state_callback1', function (args)
+ashita.events.register('key_state', 'key_state_callback1', function (e)
     --[[ Valid Arguments
 
-        args.data       - (ReadOnly) The array of key data.
-        args.data_raw   - The raw data pointer to the array of key data.
-        args.size       - (ReadOnly) The size of the key data.
+        e.data       - (ReadOnly) The array of key data.
+        e.data_raw   - The raw data pointer to the array of key data.
+        e.size       - (ReadOnly) The size of the key data.
 
         Note: Key codes used here are considered 'DirectInput key codes'.
     --]]
@@ -498,7 +498,7 @@ ashita.events.register('key_state', 'key_state_callback1', function (args)
 
     -- Use ffi to cast to the key data and block left-arrow key presses..
     local ffi = require('ffi');
-    local ptr = ffi.cast('uint8_t*', args.data_raw);
+    local ptr = ffi.cast('uint8_t*', e.data_raw);
 
     -- Block left-arrow key presses.. (Blocks game input; repeating.)
     if (ptr[203] ~= 0) then
@@ -510,28 +510,28 @@ end);
 -- func: mouse
 -- desc: Event called when the addon is processing mouse input. (WNDPROC)
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('mouse', 'mouse_callback1', function (args)
+ashita.events.register('mouse', 'mouse_callback1', function (e)
     --[[ Valid Arguments
 
-        args.message    - (ReadOnly) The mouse event id.
-        args.x          - (ReadOnly) The mouse x position.
-        args.y          - (ReadOnly) The mouse y position.
-        args.delta      - (ReadOnly) The mouse scroll delta.
-        args.blocked    - Flag that states if the mouse has been, or should be, blocked.
+        e.message    - (ReadOnly) The mouse event id.
+        e.x          - (ReadOnly) The mouse x position.
+        e.y          - (ReadOnly) The mouse y position.
+        e.delta      - (ReadOnly) The mouse scroll delta.
+        e.blocked    - Flag that states if the mouse has been, or should be, blocked.
     --]]
 
     -- Make a 100x100 pixel dead-zone at the top-left of the screen to block all mouse input..
-    if (args.x >= 0 and args.x <= 100) then
-        if (args.y >= 0 and args.y <= 100) then
+    if (e.x >= 0 and e.x <= 100) then
+        if (e.y >= 0 and e.y <= 100) then
             print("[Example] Blocked a mouse event in 100x100 dead zone!");
-            args.blocked = true;
+            e.blocked = true;
             return;
         end
     end
 
     -- Block left-clicks..
-    if (args.message == 513 or args.message == 514) then
-        args.blocked = true;
+    if (e.message == 513 or e.message == 514) then
+        e.blocked = true;
         return;
     end
 end);
@@ -568,13 +568,13 @@ end);
 -- func: d3d_dp
 -- desc: Event called when the Direct3D device is drawing a primitive. (DrawPrimitive)
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('d3d_dp', 'd3d_dp_callback1', function (args)
+ashita.events.register('d3d_dp', 'd3d_dp_callback1', function (e)
     --[[ Valid Arguments
 
-        args.primitive_type     - (ReadOnly) The type of primitive being rendered.
-        args.start_vertex       - (ReadOnly) Index of the first vertex to load.
-        args.primitive_count    - (ReadOnly) Number of primitives to render.
-        args.blocked            - Flag that states if the event has been, or should be, blocked.
+        e.primitive_type     - (ReadOnly) The type of primitive being rendered.
+        e.start_vertex       - (ReadOnly) Index of the first vertex to load.
+        e.primitive_count    - (ReadOnly) Number of primitives to render.
+        e.blocked            - Flag that states if the event has been, or should be, blocked.
     --]]
 end);
 
@@ -582,14 +582,14 @@ end);
 -- func: d3d_dpup
 -- desc: Event called when the Direct3D device is drawing a primitive. (DrawPrimitiveUP)
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('d3d_dpup', 'd3d_dpup_callback1', function (args)
+ashita.events.register('d3d_dpup', 'd3d_dpup_callback1', function (e)
     --[[ Valid Arguments
 
-        args.primitive_type             - (ReadOnly) The type of primitive being rendered.
-        args.primitive_count            - (ReadOnly) Number of primitives to render.
-        args.vertex_stream_zero_data    - (ReadOnly) User memory pointer to vertex data to use for vertex stream zero.
-        args.vertex_stream_zero_stride  - (ReadOnly) Stride between data for each vertex, in bytes.
-        args.blocked                    - Flag that states if the event has been, or should be, blocked.
+        e.primitive_type             - (ReadOnly) The type of primitive being rendered.
+        e.primitive_count            - (ReadOnly) Number of primitives to render.
+        e.vertex_stream_zero_data    - (ReadOnly) User memory pointer to vertex data to use for vertex stream zero.
+        e.vertex_stream_zero_stride  - (ReadOnly) Stride between data for each vertex, in bytes.
+        e.blocked                    - Flag that states if the event has been, or should be, blocked.
     --]]
 end);
 
@@ -597,15 +597,15 @@ end);
 -- func: d3d_dip
 -- desc: Event called when the Direct3D device is drawing a primitive. (DrawIndexedPrimitive)
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('d3d_dip', 'd3d_dip_callback1', function (args)
+ashita.events.register('d3d_dip', 'd3d_dip_callback1', function (e)
     --[[ Valid Arguments
 
-        args.primitive_type - (ReadOnly) The type of primitive being rendered.
-        args.min_index      - (ReadOnly) Minimum vertex index for the vertices used during this call.
-        args.num_vertices   - (ReadOnly) Number of vertices used during this call.
-        args.start_index    - (ReadOnly) Location in the index array to start reading indices.
-        args.prim_count     - (ReadOnly) Number of primitives to render.
-        args.blocked        - Flag that states if the event has been, or should be, blocked.
+        e.primitive_type - (ReadOnly) The type of primitive being rendered.
+        e.min_index      - (ReadOnly) Minimum vertex index for the vertices used during this call.
+        e.num_vertices   - (ReadOnly) Number of vertices used during this call.
+        e.start_index    - (ReadOnly) Location in the index array to start reading indices.
+        e.prim_count     - (ReadOnly) Number of primitives to render.
+        e.blocked        - Flag that states if the event has been, or should be, blocked.
     --]]
 end);
 
@@ -613,17 +613,17 @@ end);
 -- func: d3d_dipup
 -- desc: Event called when the Direct3D device is drawing a primitive. (DrawIndexedPrimitiveUP)
 ----------------------------------------------------------------------------------------------------
-ashita.events.register('d3d_dipup', 'd3d_dipup_callback1', function (args)
+ashita.events.register('d3d_dipup', 'd3d_dipup_callback1', function (e)
     --[[ Valid Arguments
 
-        args.primitive_type             - (ReadOnly) The type of primitive being rendered.
-        args.min_vertex_index           - (ReadOnly) Minimum vertex index, relative to zero, for vertices used during this call. 
-        args.num_vertex_indices         - (ReadOnly) Number of vertices used during this call.
-        args.primitive_count            - (ReadOnly) Number of primitives to render.
-        args.index_data                 - (ReadOnly) User memory pointer to the index data.
-        args.index_data_format          - (ReadOnly) The format type of the index data.
-        args.vertex_stream_zero_data    - (ReadOnly) User memory pointer to vertex data to use for vertex stream zero.
-        args.vertex_stream_zero_stride  - (ReadOnly) Stride between data for each vertex, in bytes.
-        args.blocked                    - Flag that states if the event has been, or should be, blocked.
+        e.primitive_type             - (ReadOnly) The type of primitive being rendered.
+        e.min_vertex_index           - (ReadOnly) Minimum vertex index, relative to zero, for vertices used during this call. 
+        e.num_vertex_indices         - (ReadOnly) Number of vertices used during this call.
+        e.primitive_count            - (ReadOnly) Number of primitives to render.
+        e.index_data                 - (ReadOnly) User memory pointer to the index data.
+        e.index_data_format          - (ReadOnly) The format type of the index data.
+        e.vertex_stream_zero_data    - (ReadOnly) User memory pointer to vertex data to use for vertex stream zero.
+        e.vertex_stream_zero_stride  - (ReadOnly) Stride between data for each vertex, in bytes.
+        e.blocked                    - Flag that states if the event has been, or should be, blocked.
     --]]
 end);
