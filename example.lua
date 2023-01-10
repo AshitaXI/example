@@ -1,5 +1,5 @@
 --[[
-* Addons - Copyright (c) 2021 Ashita Development Team
+* Addons - Copyright (c) 2023 Ashita Development Team
 * Contact: https://www.ashitaxi.com/
 * Contact: https://discord.gg/Ashita
 *
@@ -24,7 +24,6 @@ addon.author    = 'atom0s';                     -- The name of the addon author.
 addon.version   = '1.0';                        -- The version of the addon. (No specific format, x.x at least recommended.)
 addon.desc      = 'An example description.';    -- (Optional) The description of the addon.
 addon.link      = 'https://ashitaxi.com/';      -- (Optional) The link to the addons homepage.
-
 
 --[[ Ashita v4 Addons Notes
 
@@ -102,6 +101,9 @@ addon.link      = 'https://ashitaxi.com/';      -- (Optional) The link to the ad
     plugin_event
         New event; used for allowing plugins/addons to communicate in a non-blocking manner.
 
+    dinput_button
+        New event; used for processing DirectInput controller input.
+
     key
         New event; used for processing keyboard input.
         This event is used when inputting text into chat, messages, comments, etc.
@@ -118,6 +120,12 @@ addon.link      = 'https://ashitaxi.com/';      -- (Optional) The link to the ad
 
     mouse
         New event; used for processing mouse input.
+
+    xinput_button
+        New event; used for processing XInput controller input.
+
+    xinput_state
+        New event; used for processing XInput controller input.
 
     d3d_beginscene
         Renamed from prerender in v3.
@@ -220,26 +228,26 @@ addon.link      = 'https://ashitaxi.com/';      -- (Optional) The link to the ad
         affect the length of time it takes to complete something. (30fps vs. 60fps is not the same delay wise!)
 --]]
 
-----------------------------------------------------------------------------------------------------
--- func: load
--- desc: Event called when the addon is being loaded.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: load
+* desc : Event called when the addon is being loaded.
+--]]
 ashita.events.register('load', 'load_callback1', function ()
     print("[Example] 'load' event was called.");
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: unload
--- desc: Event called when the addon is being unloaded.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: unload
+* desc : Event called when the addon is being unloaded.
+--]]
 ashita.events.register('unload', 'unload_callback1', function ()
     print("[Example] 'unload' event was called.");
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: command
--- desc: Event called when the addon is processing a command.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: command
+* desc : Event called when the addon is processing a command.
+--]]
 ashita.events.register('command', 'command_callback1', function (e)
     --[[ Valid Arguments
 
@@ -262,10 +270,10 @@ ashita.events.register('command', 'command_callback1', function (e)
     end
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: text_in
--- desc: Event called when the addon is processing incoming text.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: text_in
+* desc : Event called when the addon is processing incoming text.
+--]]
 ashita.events.register('text_in', 'text_in_callback1', function (e)
     --[[ Valid Arguments
 
@@ -306,10 +314,10 @@ ashita.events.register('text_in', 'text_in_callback1', function (e)
     end
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: text_out
--- desc: Event called when the addon is processing outgoing text.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: text_out
+* desc : Event called when the addon is processing outgoing text.
+--]]
 ashita.events.register('text_out', 'text_out_callback1', function (e)
     --[[ Valid Arguments
 
@@ -332,10 +340,10 @@ ashita.events.register('text_out', 'text_out_callback1', function (e)
     print("[Example] 'text_out' event was called: " .. e.message);
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: packet_in
--- desc: Event called when the addon is processing incoming packets.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: packet_in
+* desc : Event called when the addon is processing incoming packets.
+--]]
 ashita.events.register('packet_in', 'packet_in_callback1', function (e)
     --[[ Valid Arguments
 
@@ -365,10 +373,10 @@ ashita.events.register('packet_in', 'packet_in_callback1', function (e)
     end
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: packet_out
--- desc: Event called when the addon is processing outgoing packets.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: packet_out
+* desc : Event called when the addon is processing outgoing packets.
+--]]
 ashita.events.register('packet_out', 'packet_out_callback1', function (e)
     --[[ Valid Arguments
 
@@ -398,10 +406,10 @@ ashita.events.register('packet_out', 'packet_out_callback1', function (e)
     end
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: plugin_event
--- desc: Event called when the addon is processing plugin events.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: plugin_event
+* desc : Event called when the addon is processing plugin events.
+--]]
 ashita.events.register('plugin_event', 'plugin_event_callback1', function (e)
     --[[ Valid Arguments
 
@@ -412,10 +420,24 @@ ashita.events.register('plugin_event', 'plugin_event_callback1', function (e)
     --]]
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: key
--- desc: Event called when the addon is processing keyboard input. (WNDPROC)
-----------------------------------------------------------------------------------------------------
+--[[
+* event: dinput_button
+* desc : Event called when the addon is processing DirectInput controller input.
+--]]
+ashita.events.register('dinput_button', 'dinput_button_callback1', function (e)
+    --[[ Valid Arguments
+
+        e.button    - The controller button id.
+        e.state     - The controller button state value.
+        e.blocked   - Flag that states if the button has been, or should be, blocked.
+        e.injected  - (ReadOnly) Flag that states if the button was injected by Ashita or an addon/plugin.
+    --]]
+end);
+
+--[[
+* event: key
+* desc : Event called when the addon is processing keyboard input. (WNDPROC)
+--]]
 ashita.events.register('key', 'key_callback1', function (e)
     --[[ Valid Arguments
 
@@ -444,10 +466,10 @@ ashita.events.register('key', 'key_callback1', function (e)
     end
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: key_data
--- desc: Event called when the addon is processing keyboard input. (DirectInput GetDeviceData)
-----------------------------------------------------------------------------------------------------
+--[[
+* event: key_data
+* desc : Event called when the addon is processing keyboard input. (DirectInput GetDeviceData)
+--]]
 ashita.events.register('key_data', 'key_data_callback1', function (e)
     --[[ Valid Arguments
 
@@ -473,10 +495,10 @@ ashita.events.register('key_data', 'key_data_callback1', function (e)
     end
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: key_state
--- desc: Event called when the addon is processing keyboard input. (DirectInput GetDeviceState)
-----------------------------------------------------------------------------------------------------
+--[[
+* event: key_state
+* desc : Event called when the addon is processing keyboard input. (DirectInput GetDeviceState)
+--]]
 ashita.events.register('key_state', 'key_state_callback1', function (e)
     --[[ Valid Arguments
 
@@ -506,10 +528,10 @@ ashita.events.register('key_state', 'key_state_callback1', function (e)
     end
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: mouse
--- desc: Event called when the addon is processing mouse input. (WNDPROC)
-----------------------------------------------------------------------------------------------------
+--[[
+* event: mouse
+* desc : Event called when the addon is processing mouse input. (WNDPROC)
+--]]
 ashita.events.register('mouse', 'mouse_callback1', function (e)
     --[[ Valid Arguments
 
@@ -536,38 +558,66 @@ ashita.events.register('mouse', 'mouse_callback1', function (e)
     end
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: d3d_beginscene
--- desc: Event called when the Direct3D device is beginning a scene.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: xinput_button
+* desc : Event called when the addon is processing XInput controller input.
+--]]
+ashita.events.register('xinput_button', 'xinput_button_callback1', function (e)
+    --[[ Valid Arguments
+
+        e.button    - The controller button id.
+        e.state     - The controller button state value.
+        e.blocked   - Flag that states if the button has been, or should be, blocked.
+        e.injected  - (ReadOnly) Flag that states if the button was injected by Ashita or an addon/plugin.
+    --]]
+end);
+
+--[[
+* event: xinput_state
+* desc : Event called when the addon is processing XInput controller input.
+--]]
+ashita.events.register('xinput_state', 'xinput_state_callback1', function (e)
+    --[[ Valid Arguments
+
+        e.size              - (ReadOnly) The size of the state information. (Always sizeof(XINPUT_STATE))
+        e.user              - (ReadOnly) Index of the user's controller.
+        e.state             - (ReadOnly) The current XINPUT_STATE information of the event.
+        e.state_modified    - The modified XINPUT_STATE information of the event.
+    --]]
+end);
+
+--[[
+* event: d3d_beginscene
+* desc : Event called when the Direct3D device is beginning a scene.
+--]]
 ashita.events.register('d3d_beginscene', 'd3d_beginscene_callback1', function (isRenderingBackBuffer)
 
     -- isRenderingBackBuffer is a flag that will be true when the game is currently rendering to the back buffer.
 
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: d3d_endscene
--- desc: Event called when the Direct3D device is ending a scene.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: d3d_endscene
+* desc : Event called when the Direct3D device is ending a scene.
+--]]
 ashita.events.register('d3d_endscene', 'd3d_endscene_callback1', function (isRenderingBackBuffer)
 
     -- isRenderingBackBuffer is a flag that will be true when the game is currently rendering to the back buffer.
 
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: d3d_present
--- desc: Event called when the Direct3D device is presenting a scene.
-----------------------------------------------------------------------------------------------------
+--[[
+* event: d3d_present
+* desc : Event called when the Direct3D device is presenting a scene.
+--]]
 ashita.events.register('d3d_present', 'd3d_present_callback1', function ()
 
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: d3d_dp
--- desc: Event called when the Direct3D device is drawing a primitive. (DrawPrimitive)
-----------------------------------------------------------------------------------------------------
+--[[
+* event: d3d_dp
+* desc : Event called when the Direct3D device is drawing a primitive. (DrawPrimitive)
+--]]
 ashita.events.register('d3d_dp', 'd3d_dp_callback1', function (e)
     --[[ Valid Arguments
 
@@ -578,10 +628,10 @@ ashita.events.register('d3d_dp', 'd3d_dp_callback1', function (e)
     --]]
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: d3d_dpup
--- desc: Event called when the Direct3D device is drawing a primitive. (DrawPrimitiveUP)
-----------------------------------------------------------------------------------------------------
+--[[
+* event: d3d_dpup
+* desc : Event called when the Direct3D device is drawing a primitive. (DrawPrimitiveUP)
+--]]
 ashita.events.register('d3d_dpup', 'd3d_dpup_callback1', function (e)
     --[[ Valid Arguments
 
@@ -593,10 +643,10 @@ ashita.events.register('d3d_dpup', 'd3d_dpup_callback1', function (e)
     --]]
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: d3d_dip
--- desc: Event called when the Direct3D device is drawing a primitive. (DrawIndexedPrimitive)
-----------------------------------------------------------------------------------------------------
+--[[
+* event: d3d_dip
+* desc : Event called when the Direct3D device is drawing a primitive. (DrawIndexedPrimitive)
+--]]
 ashita.events.register('d3d_dip', 'd3d_dip_callback1', function (e)
     --[[ Valid Arguments
 
@@ -609,10 +659,10 @@ ashita.events.register('d3d_dip', 'd3d_dip_callback1', function (e)
     --]]
 end);
 
-----------------------------------------------------------------------------------------------------
--- func: d3d_dipup
--- desc: Event called when the Direct3D device is drawing a primitive. (DrawIndexedPrimitiveUP)
-----------------------------------------------------------------------------------------------------
+--[[
+* event: d3d_dipup
+* desc : Event called when the Direct3D device is drawing a primitive. (DrawIndexedPrimitiveUP)
+--]]
 ashita.events.register('d3d_dipup', 'd3d_dipup_callback1', function (e)
     --[[ Valid Arguments
 
