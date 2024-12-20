@@ -254,7 +254,7 @@ ashita.events.register('command', 'command_callback1', function (e)
         e.mode       - (ReadOnly) The mode of the command.
         e.command    - (ReadOnly) The raw command string.
         e.injected   - (ReadOnly) Flag that states if the command was injected by Ashita or an addon/plugin.
-        e.blocked    - Flag that states if the command has been, or should be, blocked.
+        e.blocked    - (Writable) Flag that states if the command has been, or should be, blocked.
     --]]
 
     -- Handle the /test command..
@@ -280,11 +280,11 @@ ashita.events.register('text_in', 'text_in_callback1', function (e)
         e.mode               - (ReadOnly) The message mode.
         e.indent             - (ReadOnly) Flag that determines if the message is indented.
         e.message            - (ReadOnly) The raw message string.
-        e.mode_modified      - The modified mode.
-        e.indent_modified    - The modified indent flag.
-        e.message_modified   - The modified message.
+        e.mode_modified      - (Writable) The modified mode.
+        e.indent_modified    - (Writable) The modified indent flag.
+        e.message_modified   - (Writable) The modified message.
         e.injected           - (ReadOnly) Flag that states if the text was injected by Ashita or an addon/plugin.
-        e.blocked            - Flag that states if the text has been, or should be, blocked.
+        e.blocked            - (Writable) Flag that states if the text has been, or should be, blocked.
     --]]
 
     --[[ Note: Deadlock Warning!
@@ -323,10 +323,10 @@ ashita.events.register('text_out', 'text_out_callback1', function (e)
 
         e.mode               - (ReadOnly) The message mode.
         e.message            - (ReadOnly) The raw message string.
-        e.mode_modified      - The modified mode.
-        e.message_modified   - The modified message.
+        e.mode_modified      - (Writable) The modified mode.
+        e.message_modified   - (Writable) The modified message.
         e.injected           - (ReadOnly) Flag that states if the text was injected by Ashita or an addon/plugin.
-        e.blocked            - Flag that states if the text has been, or should be, blocked.
+        e.blocked            - (Writable) Flag that states if the text has been, or should be, blocked.
     --]]
 
     -- Block /wave commands not handled previously in the command event..
@@ -350,14 +350,14 @@ ashita.events.register('packet_in', 'packet_in_callback1', function (e)
         e.id                 - (ReadOnly) The id of the packet.
         e.size               - (ReadOnly) The size of the packet.
         e.data               - (ReadOnly) The data of the packet.
-        e.data_raw           - The raw data pointer of the packet. (Use with FFI.)
-        e.data_modified      - The modified data.
-        e.data_modified_raw  - The modified raw data. (Use with FFI.)
-        e.chunk_size         - The size of the full packet chunk that contained the packet.
-        e.chunk_data         - The data of the full packet chunk that contained the packet.
-        e.chunk_data_raw     - The raw data pointer of the full packet chunk that contained the packet. (Use with FFI.)
+        e.data_raw           - (Writable) The raw data pointer of the packet. (Use with FFI.)
+        e.data_modified      - (Writable) The modified data.
+        e.data_modified_raw  - (Writable) The modified raw data. (Use with FFI.)
+        e.chunk_size         - (ReadOnly) The size of the full packet chunk that contained the packet.
+        e.chunk_data         - (Writable) The data of the full packet chunk that contained the packet.
+        e.chunk_data_raw     - (Writable) The raw data pointer of the full packet chunk that contained the packet. (Use with FFI.)
         e.injected           - (ReadOnly) Flag that states if the packet was injected by Ashita or an addon/plugin.
-        e.blocked            - Flag that states if the packet has been, or should be, blocked.
+        e.blocked            - (Writable) Flag that states if the packet has been, or should be, blocked.
     --]]
 
     -- Look for emote packets..
@@ -383,14 +383,14 @@ ashita.events.register('packet_out', 'packet_out_callback1', function (e)
         e.id                 - (ReadOnly) The id of the packet.
         e.size               - (ReadOnly) The size of the packet.
         e.data               - (ReadOnly) The data of the packet.
-        e.data_raw           - The raw data pointer of the packet. (Use with FFI.)
-        e.data_modified      - The modified data.
-        e.data_modified_raw  - The modified raw data. (Use with FFI.)
-        e.chunk_size         - The size of the full packet chunk that contained the packet.
-        e.chunk_data         - The data of the full packet chunk that contained the packet.
-        e.chunk_data_raw     - The raw data pointer of the full packet chunk that contained the packet. (Use with FFI.)
+        e.data_raw           - (Writable) The raw data pointer of the packet. (Use with FFI.)
+        e.data_modified      - (Writable) The modified data.
+        e.data_modified_raw  - (Writable) The modified raw data. (Use with FFI.)
+        e.chunk_size         - (ReadOnly) The size of the full packet chunk that contained the packet.
+        e.chunk_data         - (Writable) The data of the full packet chunk that contained the packet.
+        e.chunk_data_raw     - (Writable) The raw data pointer of the full packet chunk that contained the packet. (Use with FFI.)
         e.injected           - (ReadOnly) Flag that states if the packet was injected by Ashita or an addon/plugin.
-        e.blocked            - Flag that states if the packet has been, or should be, blocked.
+        e.blocked            - (Writable) Flag that states if the packet has been, or should be, blocked.
     --]]
 
     -- Look for emote packets..
@@ -414,8 +414,8 @@ ashita.events.register('plugin_event', 'plugin_event_callback1', function (e)
     --[[ Valid Arguments
 
         e.name       - (ReadOnly) The name of the plugin event.
-        e.data       - The data of the event.
-        e.data_raw   - The raw data pointer of the event. (Use with FFI.)
+        e.data       - (Writable) The data of the event.
+        e.data_raw   - (Writable) The raw data pointer of the event. (Use with FFI.)
         e.size       - (ReadOnly) The size of the data.
     --]]
 end);
@@ -427,9 +427,9 @@ end);
 ashita.events.register('dinput_button', 'dinput_button_callback1', function (e)
     --[[ Valid Arguments
 
-        e.button    - The controller button id.
-        e.state     - The controller button state value.
-        e.blocked   - Flag that states if the button has been, or should be, blocked.
+        e.button    - (Writable) The controller button id.
+        e.state     - (Writable) The controller button state value.
+        e.blocked   - (Writable) Flag that states if the button has been, or should be, blocked.
         e.injected  - (ReadOnly) Flag that states if the button was injected by Ashita or an addon/plugin.
     --]]
 end);
@@ -443,7 +443,7 @@ ashita.events.register('key', 'key_callback1', function (e)
 
         e.wparam     - (ReadOnly) The wparam of the event.
         e.lparam     - (ReadOnly) The lparam of the event.
-        e.blocked    - Flag that states if the key has been, or should be, blocked.
+        e.blocked    - (Writable) Flag that states if the key has been, or should be, blocked.
 
         See the following article for how to process and use wparam/lparam values:
         https://docs.microsoft.com/en-us/previous-versions/windows/desktop/legacy/ms644984(v=vs.85)
@@ -475,7 +475,7 @@ ashita.events.register('key_data', 'key_data_callback1', function (e)
 
         e.key        - (ReadOnly) The DirectInput key id.
         e.down       - (ReadOnly) The down state of the key.
-        e.blocked    - Flag that states if the key has been, or should be, blocked.
+        e.blocked    - (Writable) Flag that states if the key has been, or should be, blocked.
 
         Note: Key codes used here are considered 'DirectInput key codes'.
     --]]
@@ -503,7 +503,7 @@ ashita.events.register('key_state', 'key_state_callback1', function (e)
     --[[ Valid Arguments
 
         e.data       - (ReadOnly) The array of key data.
-        e.data_raw   - The raw data pointer to the array of key data.
+        e.data_raw   - (Writable) The raw data pointer to the array of key data.
         e.size       - (ReadOnly) The size of the key data.
 
         Note: Key codes used here are considered 'DirectInput key codes'.
@@ -536,10 +536,12 @@ ashita.events.register('mouse', 'mouse_callback1', function (e)
     --[[ Valid Arguments
 
         e.message    - (ReadOnly) The mouse event id.
+        e.wparam     - (ReadOnly) The wparam of the event.
+        e.lparam     - (ReadOnly) The lparam of the event.
         e.x          - (ReadOnly) The mouse x position.
         e.y          - (ReadOnly) The mouse y position.
         e.delta      - (ReadOnly) The mouse scroll delta.
-        e.blocked    - Flag that states if the mouse has been, or should be, blocked.
+        e.blocked    - (Writable) Flag that states if the mouse has been, or should be, blocked.
     --]]
 
     -- Make a 100x100 pixel dead-zone at the top-left of the screen to block all mouse input..
@@ -565,9 +567,9 @@ end);
 ashita.events.register('xinput_button', 'xinput_button_callback1', function (e)
     --[[ Valid Arguments
 
-        e.button    - The controller button id.
-        e.state     - The controller button state value.
-        e.blocked   - Flag that states if the button has been, or should be, blocked.
+        e.button    - (Writable) The controller button id.
+        e.state     - (Writable) The controller button state value.
+        e.blocked   - (Writable) Flag that states if the button has been, or should be, blocked.
         e.injected  - (ReadOnly) Flag that states if the button was injected by Ashita or an addon/plugin.
     --]]
 end);
@@ -582,7 +584,7 @@ ashita.events.register('xinput_state', 'xinput_state_callback1', function (e)
         e.size              - (ReadOnly) The size of the state information. (Always sizeof(XINPUT_STATE))
         e.user              - (ReadOnly) Index of the user's controller.
         e.state             - (ReadOnly) The current XINPUT_STATE information of the event.
-        e.state_modified    - The modified XINPUT_STATE information of the event.
+        e.state_modified    - (Writable) The modified XINPUT_STATE information of the event.
     --]]
 end);
 
@@ -624,7 +626,7 @@ ashita.events.register('d3d_dp', 'd3d_dp_callback1', function (e)
         e.primitive_type     - (ReadOnly) The type of primitive being rendered.
         e.start_vertex       - (ReadOnly) Index of the first vertex to load.
         e.primitive_count    - (ReadOnly) Number of primitives to render.
-        e.blocked            - Flag that states if the event has been, or should be, blocked.
+        e.blocked            - (Writable) Flag that states if the event has been, or should be, blocked.
     --]]
 end);
 
@@ -639,7 +641,7 @@ ashita.events.register('d3d_dpup', 'd3d_dpup_callback1', function (e)
         e.primitive_count            - (ReadOnly) Number of primitives to render.
         e.vertex_stream_zero_data    - (ReadOnly) User memory pointer to vertex data to use for vertex stream zero.
         e.vertex_stream_zero_stride  - (ReadOnly) Stride between data for each vertex, in bytes.
-        e.blocked                    - Flag that states if the event has been, or should be, blocked.
+        e.blocked                    - (Writable) Flag that states if the event has been, or should be, blocked.
     --]]
 end);
 
@@ -650,12 +652,12 @@ end);
 ashita.events.register('d3d_dip', 'd3d_dip_callback1', function (e)
     --[[ Valid Arguments
 
-        e.primitive_type - (ReadOnly) The type of primitive being rendered.
-        e.min_index      - (ReadOnly) Minimum vertex index for the vertices used during this call.
-        e.num_vertices   - (ReadOnly) Number of vertices used during this call.
-        e.start_index    - (ReadOnly) Location in the index array to start reading indices.
-        e.prim_count     - (ReadOnly) Number of primitives to render.
-        e.blocked        - Flag that states if the event has been, or should be, blocked.
+        e.primitive_type    - (ReadOnly) The type of primitive being rendered.
+        e.min_index         - (ReadOnly) Minimum vertex index for the vertices used during this call.
+        e.num_vertices      - (ReadOnly) Number of vertices used during this call.
+        e.start_index       - (ReadOnly) Location in the index array to start reading indices.
+        e.primitive_count   - (ReadOnly) Number of primitives to render.
+        e.blocked           - (Writable) Flag that states if the event has been, or should be, blocked.
     --]]
 end);
 
@@ -674,6 +676,6 @@ ashita.events.register('d3d_dipup', 'd3d_dipup_callback1', function (e)
         e.index_data_format          - (ReadOnly) The format type of the index data.
         e.vertex_stream_zero_data    - (ReadOnly) User memory pointer to vertex data to use for vertex stream zero.
         e.vertex_stream_zero_stride  - (ReadOnly) Stride between data for each vertex, in bytes.
-        e.blocked                    - Flag that states if the event has been, or should be, blocked.
+        e.blocked                    - (Writable) Flag that states if the event has been, or should be, blocked.
     --]]
 end);
